@@ -1,4 +1,5 @@
 import sqlite3
+import subprocess
 import requests
 
 # WARNING:
@@ -8,11 +9,9 @@ import requests
 ADMIN_USERNAME = "admin"
 
 # Vulnerability 1: hardcoded password.
-# Passwords should never be stored directly inside source code.
 ADMIN_PASSWORD = "SuperSecretPassword123"
 
 # Vulnerability 2: hardcoded fake API key.
-# API keys should be stored in environment variables or a secret manager.
 PAYMENT_API_KEY_SECRET = "fake-api-key-123456789"
 
 
@@ -35,7 +34,6 @@ def unsafe_login(username, password):
     cursor = connection.cursor()
 
     # Vulnerability 3: SQL injection.
-    # User input is joined directly into the SQL query.
     query = (
         "SELECT * FROM users WHERE username = '"
         + username
@@ -56,9 +54,14 @@ def unsafe_login(username, password):
     return "Login failed"
 
 
+def dangerous_file_backup(file_name):
+    # Vulnerability 4: command injection.
+    # User-controlled input is joined into an operating system command.
+    command = "tar -czf backup.tar.gz " + file_name
+    subprocess.Popen(command, shell=True)
+
+
 def call_payment_provider():
-    # This is only here to show an API key being used incorrectly.
-    # It is fake and will not connect to a real payment provider.
     headers = {"Authorization": "Bearer " + PAYMENT_API_KEY_SECRET}
 
     response = requests.get(
